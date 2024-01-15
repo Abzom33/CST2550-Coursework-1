@@ -1,0 +1,239 @@
+// Test Scenario 2 :  Display the Member Information
+// Test Case : Making sure it displayMember Functions works
+//  Steps :  1. Press 2 to Use the Display Function  2.Follow the function.
+// Expected Result :  To see the Member's name , address and email or "Member nor found "
+// Pass/Fail : Pass
+// Improvement : However , I would like it to Display the Member's name , adress and email . I need to fix it.
+
+        #include < iostream > 
+
+        #include <vector>
+
+        #include <ctime>
+
+        #include <string>
+
+        #include <algorithm>
+
+        #include <fstream>
+
+        #include <sstream>
+
+        #include <iomanip>
+
+        class Book {
+                public:
+                        // Assuming Book class has appropriate member variables and constructor
+                        int BookID;
+                std::string BookName;
+                std::string authorFirstName;
+                std::string authorLastName;
+                std::string BookType;
+        };
+
+class Library {
+        public: void loadBooksFromCSV(const std::string & filename);
+
+        private: std::vector < Book > books;
+};
+
+class Member {
+        public: Member(int memberId,
+                const std::string & name,
+                        const std::string & address,
+                                const std::string & email): memberId(memberId),
+        name(name),
+        address(address),
+        email(email),
+        booksBorrowed(0),
+        dueDate(0) {}
+
+        int getMemberId() const {
+                return memberId;
+        }
+
+        void borrowBook() {
+                // Implement the logic to borrow a book
+                booksBorrowed++;
+                std::cout << "Book borrowed successfully.\n";
+
+                // Set the due date to 7 days from the current date (for example)
+                dueDate = time(0) + 7 * 24 * 60 * 60; // 7 days in seconds
+        }
+
+        void returnBook() {
+                // Implement the logic to return a book
+                booksBorrowed--;
+                std::cout << "Book returned successfully.\n";
+        }
+
+        int getDueDate() const {
+                return dueDate;
+        }
+
+        void displayMemberInfo() const {
+                // Implement the logic to display member information
+                std::cout << "Member ID: " << memberId << "\n";
+                std::cout << "Name: " << name << "\n";
+                std::cout << "Address: " << address << "\n";
+                std::cout << "Email: " << email << "\n";
+                std::cout << "Books Borrowed: " << booksBorrowed << "\n";
+        }
+
+        private: int memberId;
+        std::string name;
+        std::string address;
+        std::string email;
+        int booksBorrowed;
+        time_t dueDate;
+};
+
+class Librarian {
+        public: void addMember(std::vector < Member > & members) {
+                // Implementation of addMember function
+                // You should add logic to input member details and add them to the members vector
+        }
+
+        void displayBorrowedBooks(const Member & member) {
+                // Implementation of displayBorrowedBooks function
+                // You need to define how to display the borrowed books for a given member
+        }
+
+        void returnBook(Member & member) {
+                // Implementation of returnBook function
+                // Calculate fine if the book is overdue
+                time_t currentTime = time(0);
+
+                if (currentTime > member.getDueDate()) {
+                        // Calculate the number of days overdue
+                        int daysOverdue = static_cast < int > ((currentTime - member.getDueDate()) / (24 * 60 * 60));
+
+                        // Fine rate is £1 per day overdue
+                        double fine = daysOverdue * 1.0;
+
+                        std::cout << "Fine calculated: £" << fine << " for " << daysOverdue << " days overdue.\n";
+                } else {
+                        std::cout << "Book returned on time. No fine.\n";
+                }
+
+                // Call the returnBook function for the member
+                member.returnBook();
+        }
+};
+
+void Library::loadBooksFromCSV(const std::string & filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+                std::cerr << "Error opening file: " << filename << std::endl;
+                return;
+        }
+
+        books.clear(); // Clear existing books before loading
+
+        std::string line;
+        while (std::getline(file, line)) {
+                std::istringstream iss(line);
+                Book book;
+                std::string temp;
+                iss >> book.BookID >> std::ws;
+
+                // Read the BookName by considering the entire line
+                std::getline(iss, temp, ',');
+                std::getline(iss, book.BookName, ',');
+
+                iss >> book.authorFirstName >> book.authorLastName >> std::quoted(book.BookType);
+
+                books.push_back(book);
+        }
+
+        file.close();
+        std::cout << "Books loaded successfully from CSV!" << std::endl;
+}
+
+int main() {
+        std::vector < Member > members;
+        Library library; // Create a Library object
+        Librarian librarian; // Create a Librarian object                 
+        library.loadBooksFromCSV("books.csv");
+
+        int choice;
+        do {
+                std::cout << "Library System\n";
+                std::cout << "1. Add Member\n";
+                std::cout << "2. Display Member Information\n";
+                std::cout << "3. Borrow a Book\n";
+                std::cout << "4. Return Book\n";
+                std::cout << "5. Calculate Fine\n";
+                std::cout << "6. Exit\n";
+                std::cout << "Enter option: ";
+                std::cin >> choice;
+
+                switch (choice) {
+                case 1:
+                        librarian.addMember(members);
+                        break;
+                case 2: {
+                        int MemberId;
+                        std::cout << "Enter Member ID to display information: ";
+                        std::cin >> MemberId;
+
+                        auto memberIt = std::find_if(members.begin(), members.end(),
+                                [MemberId](const Member & m) {
+                                        return m.getMemberId() == MemberId;
+                                });
+
+                        if (memberIt != members.end()) {
+                                memberIt -> displayMemberInfo();
+                        } else {
+                                std::cout << "Member not found.\n";
+                        }
+                        break;
+                }
+                case 3: {
+                        int MemberId;
+                        std::cout << "Enter Member ID to borrow a book: ";
+                        std::cin >> MemberId;
+
+                        auto memberIt = std::find_if(members.begin(), members.end(),
+                                [MemberId](const Member & m) {
+                                        return m.getMemberId() == MemberId;
+                                });
+
+                        if (memberIt != members.end()) {
+                                memberIt -> borrowBook();
+                        } else {
+                                std::cout << "Member not found.\n";
+                        }
+                        break;
+                }
+                case 4: {
+                        int MemberId;
+                        std::cout << "Enter Member ID to return a book: ";
+                        std::cin >> MemberId;
+
+                        auto memberIt = std::find_if(members.begin(), members.end(),
+                                [MemberId](const Member & m) {
+                                        return m.getMemberId() == MemberId;
+                                });
+
+                        if (memberIt != members.end()) {
+                                librarian.returnBook( * memberIt);
+                        } else {
+                                std::cout << "Member not found.\n";
+                        }
+                        break;
+                }
+                case 5:
+                        // Logic for calculating fine
+                        break;
+                case 6:
+                        // Exit the program
+                        break;
+                default:
+                        std::cout << "Invalid choice. Try again.\n";
+                        break;
+                }
+        } while (choice != 6);
+
+        return 0;
+}
