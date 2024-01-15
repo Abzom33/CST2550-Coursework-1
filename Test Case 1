@@ -1,0 +1,61 @@
+//Test Scenraio 1 : Testing the Member Functions.
+// Test Case :  Make sure the AddMember Function works correctly .
+// Test Steps : 1. Add Name 2. Add ID 3.Add addreass
+// Expexted Result : The message to appear "Member added sucessfully".
+// Pass/Fail :  Pass
+include < iostream >
+
+   #include <vector>
+
+   class Member {
+      public:
+         // Assuming Member class has appropriate member variables and constructor
+         Member(int memberId,
+            const std::string & name,
+               const std::string & address,
+                  const std::string & email): memberId(memberId),
+      name(name),
+      address(address),
+      email(email) {}
+
+      // Add any other necessary member functions or variables
+      // ...
+
+      private: int memberId;
+      std::string name;
+      std::string address;
+      std::string email;
+   };
+
+void addMember(std::vector < Member > & members) {
+   int memberId;
+   std::string name, address, email;
+
+   std::cout << "Enter member ID: ";
+   std::cin >> memberId;
+
+   // Consume the newline character left in the input buffer
+
+   std::cout << "Enter name: ";
+   std::getline(std::cin, name);
+   std::cout << "Enter address: ";
+   std::getline(std::cin, address);
+   std::cout << "Enter email: ";
+   std::cin >> email;
+
+   Member newMember(memberId, name, address, email);
+   members.push_back(newMember);
+
+   std::cout << "Member added successfully\n";
+}
+
+int main() {
+   std::vector < Member > libraryMembers;
+
+   // Example of adding a member
+   addMember(libraryMembers);
+
+   // You can add more members or perform other operations with the libraryMembers vector
+
+   return 0;
+}
